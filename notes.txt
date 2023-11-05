@@ -33,12 +33,77 @@ input ->
 01101100 01100100 00100001 --> 011011 000110 010000 100001
 
 // First 6 Bit
-(in[in_index] & 0xFC) >> 2 --> (01001000 & 0xFC) >> 2
+    (in[in_index] & 0xFC) >> 2 --> (01001000 & 0xFC) >> 2
 
-// And Bit Operator
-01001000 & 01011011 = 01001000
-0xFC = 11111100
-01001011 & 11111100 = 01001000
+    // And Bit Operator
+    01001000 & 01011011 = 01001000
+    0xFC = 11111100
+    01001011 & 11111100 = 01001000
 
-// Shift Operator
-01001000 >> 2 = 00010010
+    // Shift Operator
+    01001000 >> 2 = 00010010
+
+// Second 6 Bit
+    ((in[in_index] & 0x3) << 4) | ((in[in_index+1] & 0xF0) >> 4)
+
+    0x3  -> 00000011
+    0xF0 -> 11110000
+
+    ((01001000 & 00000011) << 4) | ((01100101 & 11110000) >> 4)
+
+// Third 6 Bit
+    ((in[in_index+1] & 0xF) << 2) | ((in[in_index+2] & 0xC0) >> 6)
+
+    0xF  -> 00001111
+    0xC0 -> 11000000
+
+    ((in[in_index+1] & 00001111) << 2) | ((in[in_index+2] & 11000000) >> 6)
+
+// Fourth 6 Bit
+    in[in_index+2] && 0x3F
+
+    0x3F -> 00111111
+
+    in[in_index+2] && 00111111
+
+---------------------------------------------
+
+Padding Case 1
+
+    input -> H
+    output -> SA==
+
+    01001000
+
+    // First 6 Bit
+        (in[in_index] & 0xFC) >> 2 --> (01001000 & 0xFC) >> 2
+
+    // Second 6 Bit
+        ((in[in_index] & 0x3) << 4)
+
+    // Third 6 Bit
+        =
+
+    // Fourth 6 Bit
+        =
+
+---------------------------------------------
+
+Padding Case 2
+    
+    input -> He
+    output -> SGU=
+
+    01001000 01100101
+
+    // First 6 Bit
+	(in[in_index] & 0xFC) >> 2 --> (01001000 & 0xFC) >> 2	
+    
+    // Second 6 Bit
+	((in[in_index] & 0x3) << 4) | ((in[in_index+1] & 0xF0) >> 4)
+
+    // Third 6 Bit
+	((in[in_index+1] & 0xF) << 2)
+
+    // Fourth 6 Bit
+        =

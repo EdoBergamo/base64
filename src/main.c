@@ -26,7 +26,9 @@ void base64_encode(const char *in, const unsigned long in_len, char *out) {
 
 	if ((in_index + 1) == in_len) {
 	    // First Padding Case
-	    printf("Padding case 1\n");
+	    out[out_index++] = BASE64[((in[in_index] & 0x3) << 4)];
+	    out[out_index++] = '=';
+	    out[out_index++] = '=';
 	    break;
 	}
 
@@ -36,7 +38,8 @@ void base64_encode(const char *in, const unsigned long in_len, char *out) {
 
 	if ((in_index + 2) == in_len) {
 	   // Second Padding Case
-	   printf("Padding case 2\n");
+	   out[out_index++] = BASE64[((in[in_index + 1] & 0xF) << 2)];
+	   out[out_index++] = '='; 
 	   break;
 	}
 	
@@ -55,6 +58,9 @@ void base64_encode(const char *in, const unsigned long in_len, char *out) {
 
     return;
 }
+
+// -------------------------
+// TODO: Testing Helpers
 
 int main() {
     while (!feof(stdin)) {
