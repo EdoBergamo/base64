@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -118,7 +119,75 @@ int base64_decode(const char *in, const unsigned long in_len, char *out) {
 }
 
 // -------------------------
-// TODO: Testing Helpers
+// Testing Helpers
+
+int base64_encode_test(const char *in, const char *expected_out) {
+    unsigned long in_len = strlen(in);
+    unsigned long out_len = 4 * ceil(in_len / 3.0) + 1;
+    char *out = malloc(out_len);
+
+    base64_encode(in, in_len, out);
+
+    char result = memcmp(out, expected_out, out_len);
+
+    if (result == 0) {
+        fprintf(stdout, "[ENCODE-OK] %s\n Expected: %s\n Obtained: %s\n", in, expected_out, out);
+    } else {
+    	fprintf(stderr, "[ENCODE-ERR] %s\n Expected: %s\n Obtained: %s\n", in, expected_out, out);
+    }
+
+    free(out);
+    return result;
+}
+
+int base64_decode_test(const char *in, const char *expected_out) {
+    unsigned long in_len = strlen(in);
+    unsigned long padding = in[in_len-1] == '=' ? (in[in_len-1] == '=' ? 2 : 1) : 0;
+    unsigned long out_len = 3 * ceil(in_len / 4.0) - padding + 1;
+    char *out = malloc(out_len);
+
+    base64_decode(in, in_len, out);
+
+    char result = memcmp(out, expected_out, out_len);
+
+    if (result == 0) {
+      fprintf(stdout, "[encode-OK] %s\n Expected:%s\n Obtained: %s\n", in, expected_out, out);
+    } else {
+      fprintf(stderr, "[encode-ERR] %s\n Expected:%s\n Obtained: %s\n", in, expected_out, out);
+    }
+
+    free(out);
+    return result;
+}
+
+void test(void) {
+    char inputs[8][20] =  {
+      "Hello World!",
+      "a",
+      "aa",
+      "aaa",
+      "aaaa",
+      "aaaaa",
+      "aaaaaa",
+      "aaaaaaa"
+    };
+
+    char outputs[8][20] = {
+      "SGVsbG8gV29ybGQh",
+      "YQ==",
+      "YWE=",
+      "YWFh",
+      "YWFhYQ==",
+      "YWFhYWE=",
+      "YWFhYWFh",
+      "YWFhYWFhYQ=="
+    };
+
+    for (int i = 0; i < 8; i++) {
+      base64_encode_test(inputs[i], outputs[i]);
+      base64_decode_test(outputs[i], inputs[i]);
+    }
+}
 
 int main() {
     while (!feof(stdin)) {
@@ -131,6 +200,8 @@ int main() {
 
 	free(input);
     }
+
+    // test();
 
     return 0;
 }
