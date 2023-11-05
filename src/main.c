@@ -9,6 +9,7 @@ char *BASE64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/
 // Function Signatures
 
 void base64_encode(const char *in, const unsigned long in_len, char *out);
+void base64_decode(const char *in, const unsigned long in_len, char *out);
 
 // -------------------------
 // Core Implementation
@@ -57,6 +58,10 @@ void base64_encode(const char *in, const unsigned long in_len, char *out) {
     out[out_index] = '\0';
 
     return;
+}
+
+void base64_decode(const char *in, const unsigned long in_len, char *out) {
+    // TODO
 }
 
 // -------------------------
