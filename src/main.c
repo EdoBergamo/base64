@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 
@@ -189,19 +190,49 @@ void test(void) {
     }
 }
 
-int main() {
+int main(int argc, char **argv) {
+    char *option = NULL;
+    bool test_mode = false;   // -t
+    bool decode_mode = false; // -d
+
+    // Parse Arguments
+    if (argc == 2) {
+        option = argv[1];
+    }
+
+    if (option) {
+        assert(strlen(option) == 2 && "Invalid length of options!");
+        test_mode = memcmp(option, "-t", 2) == 0;
+        decode_mode = memcmp(option, "-d", 2) == 0;
+
+        if (!test_mode && !decode_mode) {
+            fprintf(stderr, "[ERROR]: Options allowed are: `-t` and `-d`\n");
+            return 1;
+        }
+  }
+
     while (!feof(stdin)) {
         char *input = readline("> ");
-	unsigned long input_length = strlen(input);
-	char output[128];
+	if (!input) { break; }
+        unsigned long in_len = strlen(input);
+        char *output = NULL;
 
-	base64_decode(input, input_length, output);
+        if (decode_mode) {
+            unsigned long padding = input[in_len-1] == '=' ? (input[in_len-1] == '=' ? 2 : 1) : 0;
+            unsigned long out_len = 3 * ceil(in_len / 4.0) - padding + 1;
+            output = malloc(out_len);
+            base64_decode(input, in_len, output);
+        } else {
+            unsigned long out_len = 4 * ceil(in_len / 3.0) + 1;
+            output = malloc(out_len);
+            base64_encode(input, in_len, output);
+	}
+
 	printf("%s\n", output);
 
 	free(input);
+	free(output);
     }
-
-    // test();
 
     return 0;
 }
